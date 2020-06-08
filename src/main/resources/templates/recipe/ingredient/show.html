@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Show Recipe</title>
+
+    <link crossorigin="anonymous" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          rel="stylesheet" th:href="@{/webjars/bootstrap/4.5.0/css/bootstrap.min.css}">
+
+    <script crossorigin="anonymous" src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+            th:src="@{/webjars/jquery/3.5.1/jquery.min.js}"></script>
+    <script crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"
+            th:src="@{/webjars/popper.js/1.16.0/umd/popper.min.js}"></script>
+    <script crossorigin="anonymous" src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+            th:src="@{/webjars/bootstrap/4.5.0/js/bootstrap.min.js}"></script>
+
+</head>
+<body>
+<div class="container-fluid" style="margin-top: 20px">
+    <div class="row justify-content-center">
+
+        <div class="col-6">
+            <div class="card card-title bg-info">
+                <h3 class="text-white" style="padding-left: 10px">Ingredient</h3>
+            </div>
+            <div class="card card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover ">
+                        <thead class="thead-inverse">
+                        <tr>
+                            <th>ID</th>
+                            <th>Description</th>
+                        </tr>
+                        </thead>
+                        <tr th:remove="all">
+                            <td>123</td>
+                            <td>Tasty Goodnees 1</td>
+                            <td><a href="#">View</a></td>
+                            <td><a href="#">Update</a></td>
+                            <td><a href="#">Delete</a></td>
+                        </tr>
+                        <tr th:remove="all">
+                            <td>12333</td>
+                            <td>Tasty Goodnees 2</td>
+                            <td><a href="#">View</a></td>
+                            <td><a href="#">Update</a></td>
+                            <td><a href="#">Delete</a></td>
+                        </tr>
+                        <tr>
+                            <td th:text="${ingredient.id}">334</td>
+                            <td th:text="${ingredient.amount} + ' ' + ${ingredient.unitOfMeasureCommand.getDescription()}
+                            + ' ' + ${ingredient.description}">
+                                Tasty Goodnees 3
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
