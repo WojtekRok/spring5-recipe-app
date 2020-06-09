@@ -11,6 +11,7 @@ import pl.wojtekrok.springrecipeapp.converters.UnitOfMeasureCommandToUnitOfMeasu
 import pl.wojtekrok.springrecipeapp.converters.UnitOfMeasureToUnitOfMeasureCommand;
 import pl.wojtekrok.springrecipeapp.domain.Ingredient;
 import pl.wojtekrok.springrecipeapp.domain.Recipe;
+import pl.wojtekrok.springrecipeapp.repositories.IngredientRepository;
 import pl.wojtekrok.springrecipeapp.repositories.RecipeRepository;
 import pl.wojtekrok.springrecipeapp.repositories.UnitOfMeasureRepository;
 
@@ -31,6 +32,9 @@ public class IngredientServiceImplTest {
     @Mock
     UnitOfMeasureRepository unitOfMeasureRepository;
 
+    @Mock
+    IngredientRepository ingredientRepository;
+
     IngredientService ingredientService;
 
     //init converters
@@ -44,7 +48,7 @@ public class IngredientServiceImplTest {
         MockitoAnnotations.initMocks(this);
 
         ingredientService = new IngredientServiceImpl(ingredientToIngredientCommand, ingredientCommandToIngredient,
-                recipeRepository, unitOfMeasureRepository);
+                recipeRepository, unitOfMeasureRepository, ingredientRepository);
     }
 
     @Test
@@ -101,6 +105,26 @@ public class IngredientServiceImplTest {
 
         //then
         assertEquals(Long.valueOf(3L), savedCommand.getId());
+        verify(recipeRepository, times(1)).findById(anyLong());
+        verify(recipeRepository, times(1)).save(any(Recipe.class));
+    }
+
+    @Test
+    public void deleteById() {
+        //given
+        Recipe recipe = new Recipe();
+        Ingredient ingredient = new Ingredient();
+        ingredient.setId(3L);
+        recipe.addIngredient(ingredient);
+        ingredient.setRecipe(recipe);
+        Optional<Recipe> recipeOptional = Optional.of(recipe);
+
+        when(recipeRepository.findById(anyLong())).thenReturn(recipeOptional);
+
+        //when
+        ingredientService.deleteById(1L, 3L);
+
+        //then
         verify(recipeRepository, times(1)).findById(anyLong());
         verify(recipeRepository, times(1)).save(any(Recipe.class));
     }

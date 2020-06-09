@@ -1,5 +1,6 @@
 package pl.wojtekrok.springrecipeapp.services;
 
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.wojtekrok.springrecipeapp.commands.IngredientCommand;
@@ -7,6 +8,7 @@ import pl.wojtekrok.springrecipeapp.converters.IngredientCommandToIngredient;
 import pl.wojtekrok.springrecipeapp.converters.IngredientToIngredientCommand;
 import pl.wojtekrok.springrecipeapp.domain.Ingredient;
 import pl.wojtekrok.springrecipeapp.domain.Recipe;
+import pl.wojtekrok.springrecipeapp.repositories.IngredientRepository;
 import pl.wojtekrok.springrecipeapp.repositories.RecipeRepository;
 import pl.wojtekrok.springrecipeapp.repositories.UnitOfMeasureRepository;
 
@@ -21,15 +23,18 @@ public class IngredientServiceImpl implements IngredientService {
     private final IngredientCommandToIngredient ingredientCommandToIngredient;
     private final RecipeRepository recipeRepository;
     private final UnitOfMeasureRepository unitOfMeasureRepository;
+    private final IngredientRepository ingredientRepository;
 
     public IngredientServiceImpl(IngredientToIngredientCommand ingredientToIngredientCommand,
                                  IngredientCommandToIngredient ingredientCommandToIngredient,
                                  RecipeRepository recipeRepository,
-                                 UnitOfMeasureRepository unitOfMeasureRepository) {
+                                 UnitOfMeasureRepository unitOfMeasureRepository,
+                                 IngredientRepository ingredientRepository) {
         this.ingredientToIngredientCommand = ingredientToIngredientCommand;
         this.ingredientCommandToIngredient = ingredientCommandToIngredient;
         this.recipeRepository = recipeRepository;
         this.unitOfMeasureRepository = unitOfMeasureRepository;
+        this.ingredientRepository = ingredientRepository;
     }
 
 
@@ -75,29 +80,59 @@ public class IngredientServiceImpl implements IngredientService {
                 foundIngredient.setAmount(ingredientCommand.getAmount());
                 foundIngredient.setUom(unitOfMeasureRepository.findById(ingredientCommand.getUnitOfMeasureCommand().getId())
                         .orElseThrow(() -> new RuntimeException("uom not found")));
+
             } else {
                 //add new Ingredient
                 recipe.addIngredient(ingredientCommandToIngredient.convert(ingredientCommand));
+
             }
 
             Recipe savedRecipe = recipeRepository.save(recipe);
 
-            Optional<Ingredient> saveIngredientOptional = savedRecipe.getIngredients().stream()
+
+            Optional<Ingredient> savedIngredientOptional = savedRecipe.getIngredients().stream()
                     .filter(recipeIngredient -> recipeIngredient.getId().equals(ingredientCommand.getId()))
                     .findFirst();
 
             //check by description
-            if (!saveIngredientOptional.isPresent()) {
-                saveIngredientOptional = savedRecipe.getIngredients().stream()
+            if (!savedIngredientOptional.isPresent()) {
+                savedIngredientOptional = savedRecipe.getIngredients().stream()
                         .filter(recipeIngredients -> recipeIngredients.getDescription().equals(ingredientCommand.getDescription()))
                         .filter(recipeIngredients -> recipeIngredients.getAmount().equals(ingredientCommand.getAmount()))
-                        .filter(recipeIngredients -> recipeIngredients.getUom().equals(ingredientCommand.getUnitOfMeasureCommand()))
+                        .filter(recipeIngredients -> recipeIngredients.getUom().getId().equals(ingredientCommand.getUnitOfMeasureCommand().getId()))
                         .findFirst();
             }
 
-            return ingredientToIngredientCommand.convert(saveIngredientOptional.get());
+            return ingredientToIngredientCommand.convert(savedIngredientOptional.get());
         }
 
 
+    }
+
+    @Override
+    public void deleteById(Long recipeId, Long ingredientId) {
+        log.debug("Deleting ingredient: " + recipeId + ":" + ingredientId);
+
+        Optional<Recipe> recipeOptional = recipeRepository.findById(recipeId);
+
+        if(recipeOptional.isPresent()){
+            Recipe recipe = recipeOptional.get();
+            log.debug("found recipe");
+
+            Optional<Ingredient> ingredientOptional = recipe.getIngredients().stream()
+                    .filter(ingredient -> ingredient.getId().equals(ingredientId))
+                    .findFirst();
+
+            if(ingredientOptional.isPresent()) {
+                log.debug("found ingredient");
+                Ingredient ingredientToDelete = ingredientOptional.get();
+                ingredientToDelete.setRecipe(null);
+                recipe.getIngredients().remove(ingredientOptional.get());
+                recipeRepository.save(recipe);
+                ingredientRepository.deleteById(ingredientId);
+            }
+        } else {
+            log.debug("Recipe Id Not Found. ID: " + recipeId);
+        }
     }
 }
