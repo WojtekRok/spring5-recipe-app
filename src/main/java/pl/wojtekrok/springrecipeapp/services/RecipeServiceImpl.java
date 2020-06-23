@@ -7,6 +7,7 @@ import pl.wojtekrok.springrecipeapp.commands.RecipeCommand;
 import pl.wojtekrok.springrecipeapp.converters.RecipeCommandToRecipe;
 import pl.wojtekrok.springrecipeapp.converters.RecipeToRecipeCommand;
 import pl.wojtekrok.springrecipeapp.domain.Recipe;
+import pl.wojtekrok.springrecipeapp.exceptions.NotFoundException;
 import pl.wojtekrok.springrecipeapp.repositories.RecipeRepository;
 
 import java.util.HashSet;
@@ -41,7 +42,7 @@ public class RecipeServiceImpl implements RecipeService {
         Optional<Recipe> recipeOptional = recipeRepository.findById(id);
 
         if (!recipeOptional.isPresent()) {
-            throw new RuntimeException("Recipe Not Found");
+            throw new NotFoundException("Recipe Not Found. For ID value: " + id.toString());
         }
 
         return recipeOptional.get();

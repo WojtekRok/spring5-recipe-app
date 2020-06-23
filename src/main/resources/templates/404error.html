@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>404 NotFound Error</title>
+
+
+    <link crossorigin="anonymous" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+                    rel="stylesheet" th:href="@{/webjars/bootstrap/4.5.0/css/bootstrap.min.css}">
+
+    <script crossorigin="anonymous" src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+                        th:src="@{/webjars/jquery/3.5.1/jquery.min.js}"></script>
+        <script crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"
+                             th:src="@{/webjars/popper.js/1.16.0/umd/popper.min.js}"></script>
+        <script crossorigin="anonymous" src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+                             th:src="@{/webjars/bootstrap/4.5.0/js/bootstrap.min.js}"></script>
+
+</head>
+<body>
+<div class="container-fluid" style="margin-top: 20px">
+    <div class="row">
+        <div class="col-6">
+            <h1>404 Not Found</h1>
+            <p th:text="${exception.getMessage()}"></p>
+<!--            <img src="../static/images/error404.jpg" alt="error">-->
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
